@@ -1,0 +1,172 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fdc755a5-a6f8-40cc-b0d4-ad55655d408d",
+      "name": "When chat message received",
+      "webhookId": "a9aa4286-08a3-4071-962c-d19e1be47a02"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a highly efficient AI automation assistant, capable of dynamically integrating and executing tools to retrieve real-time information.\n- Always list available tools first (listTools) before executing any tool.\n- For web searches, use brave_web_search and brave_local_search to retrieve the most accurate and up-to-date results.\n- Ensure tools are selected based on the most relevant match to the user query.\n- Automatically determine and execute the best tool for the task (executeTool) only after listing tools."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "0aaebca0-6c9a-4b9d-993c-70fc32e23b6d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        120,
+        220
+      ],
+      "id": "e0071633-d2b1-4bf1-9bd8-9ee1d6cdc4d2",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "c7fMqjDWNTK7UPox",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        380,
+        220
+      ],
+      "id": "1f349ab0-e6e7-4a3d-a4f3-d891a81f6076",
+      "name": "MCP Client",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "naBsqX9pJYPGcBJh",
+          "name": "MCP Client (STDIO) account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI(\"tool\", \"selected tool to execute\") }}",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        500,
+        220
+      ],
+      "id": "b103d331-95ed-49b6-b45e-ad09b88d7d34",
+      "name": "MCP Client1",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "naBsqX9pJYPGcBJh",
+          "name": "MCP Client (STDIO) account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        200
+      ],
+      "id": "49b85193-b1b2-46af-8335-21cc5e677b0b",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3a32f041-f80a-4744-ac19-4090b6658b25",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9548e05405abcc3cb7c7b8992df188ad14faeacecf59b203814fecf541d6f29"
+  },
+  "id": "vzrKuLKDCekEPVKK",
+  "tags": []
+}
